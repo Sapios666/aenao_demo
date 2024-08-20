@@ -4,9 +4,9 @@ import sys
 import signal
 import serial
 
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
 
-DOOR_SENSOR_PIN = 18
+DOOR_SENSOR_PIN = 12
 
 isOpen = None
 oldIsOpen = None
