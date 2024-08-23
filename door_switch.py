@@ -12,6 +12,7 @@ isOpen = None
 oldIsOpen = None
 valueOpen = 0
 valueClosed = 0
+url_user = "http://160.40.49.238:8000/api/userBin"
 
 voltageRange = 5 # The ADC module is powered with 5 V to match the industrial weight sensor output voltage (0-5V)
 weightVoltageRatio = 0.003 # Through approximating calculations it was estimated that the voltage drops 3mV for every kilogram added to the smart bin
