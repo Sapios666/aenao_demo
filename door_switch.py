@@ -13,6 +13,9 @@ oldIsOpen = None
 valueOpen = 0
 valueClosed = 0
 
+voltageRange = 5 # The ADC module is powered with 5 V to match the industrial weight sensor output voltage (0-5V)
+weightVoltageRatio = 0.003 # Through approximating calculations it was estimated that the voltage drops 3mV for every kilogram added to the smart bin
+
 GPIO.setup(DOOR_SENSOR_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
 def readValue():
@@ -32,7 +35,7 @@ def readValue():
 		# Convert received bytes to text format
 		decoded_bytes = (ser_bytes[0:len(ser_bytes)-2].decode())
 		# print(decoded_bytes)
-		value += int(decoded_bytes)
+		value += float(decoded_bytes)
 
 	# Close serial port
 	ser.close()
@@ -47,12 +50,12 @@ while True:
 
 	if (isOpen and (isOpen != oldIsOpen)):
 		print("Door Open")
-		#valueOpen = readValue()
-		#print(valueOpen)
+		valueOpen = readValue()
+		print(valueOpen)
 	elif (isOpen != oldIsOpen):
 		print("Door Closed")
-		#valueClosed = readValue()
-		#print(valueClosed)
-		#print("Difference = " + str(valueClosed-valueOpen))
+		valueClosed = readValue()
+		print(valueClosed)
+		print("Difference = " + str(valueClosed-valueOpen))
 
 	time.sleep(1)
