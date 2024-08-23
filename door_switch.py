@@ -12,10 +12,10 @@ isOpen = None
 oldIsOpen = None
 valueOpen = 0
 valueClosed = 0
-url_user = "http://160.40.49.238:8000/api/userBin"
+weight = 0
 
-voltageRange = 5 # The ADC module is powered with 5 V to match the industrial weight sensor output voltage (0-5V)
-weightVoltageRatio = 0.003 # Through approximating calculations it was estimated that the voltage drops 3mV for every kilogram added to the smart bin
+samples = 5 # The ADC module is powered with 5 V to match the industrial weight sensor output voltage (0-5V)
+
 
 GPIO.setup(DOOR_SENSOR_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
@@ -26,11 +26,11 @@ def readValue():
 	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200)
 	ser.flushInput()
 
-	for i in range(5):
+	for i in range(samples):
 		# Read in data from Serial until \n (new line) received
 		ser_bytes = ser.readline()
 
-	for i in range(5):
+	for i in range(samples):
 		# Read in data from Serial until \n (new line) received
 		ser_bytes = ser.readline()
 		# Convert received bytes to text format
@@ -41,7 +41,7 @@ def readValue():
 	# Close serial port
 	ser.close()
 	# Average measurements
-	value = value//5
+	value = value//samples
 	# Write received data to variable
 	return value
 
