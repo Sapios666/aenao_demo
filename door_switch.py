@@ -3,6 +3,7 @@ import time
 import sys
 import signal
 import serial
+from send_json import *
 
 GPIO.setmode(GPIO.BOARD)
 
@@ -12,7 +13,7 @@ isOpen = None
 oldIsOpen = None
 valueOpen = 0
 valueClosed = 0
-weight = 0
+diff = 0
 
 samples = 5 # The ADC module is powered with 5 V to match the industrial weight sensor output voltage (0-5V)
 
@@ -57,6 +58,8 @@ while True:
 		print("Door Closed")
 		valueClosed = readValue()
 		print(valueClosed)
-		print("Difference = " + str(valueClosed-valueOpen))
+		diff = valueClosed-valueOpen
+		print("Difference = " + str(diff))
+		send_weight(diff)
 
 	time.sleep(1)
