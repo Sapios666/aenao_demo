@@ -5,6 +5,9 @@
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 // Adafruit_ADS1015 ads;     /* Use this for the 12-bit version */
 
+float noLoadOffset = 0.151; // Prior to calibration the output voltage for zero load is 151mV.
+float weightVoltageRatio = 0.00412; // According to approximations the voltage drops 4.12mV for every kilogram added to the smart bin
+
 void setup(void)
 {
   Serial.begin(115200);
@@ -34,17 +37,23 @@ void setup(void)
 void loop(void)
 {
   int16_t results;
+  float voltage, weight;
 
   /* Be sure to update this value based on the IC and the gain settings! */
   // float   multiplier = 3.0F;    /* ADS1015 @ +/- 6.144V gain (12-bit results) */
   float multiplier = 0.1875F; /* ADS1115  @ +/- 6.144V gain (16-bit results) */
 
   results = ads.readADC_Differential_0_1();
+  voltage = results * multiplier;
+  weight = (voltage - noLoadOffset) / weightVoltageRatio;
+
 #ifdef MESSAGES
-  Serial.print("Differential: "); Serial.print(results); Serial.print("("); Serial.print(results * multiplier); Serial.println("mV)");
+  // Serial.print("Differential: "); Serial.print(results); Serial.print("("); Serial.print(results * multiplier); Serial.println("mV)");
+  Serial.print(voltage); Serial.print("V\t");
+  Serial.print(weight); Serial.print("kg\n");
   delay(1000);
 #else
-  Serial.println(results * multiplier);
+  Serial.println(weight);
   delay(100);
 #endif
 }
