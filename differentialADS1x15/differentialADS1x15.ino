@@ -45,6 +45,6 @@ void loop(void)
   delay(1000);
 #else
   Serial.println(results * multiplier);
-  delay(1);
+  delay(100);
 #endif
 }

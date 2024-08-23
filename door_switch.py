@@ -12,6 +12,7 @@ isOpen = None
 oldIsOpen = None
 valueOpen = 0
 valueClosed = 0
+url_user = "http://160.40.49.238:8000/api/userBin"
 
 GPIO.setup(DOOR_SENSOR_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
