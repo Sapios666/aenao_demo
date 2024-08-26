@@ -1,12 +1,12 @@
 #include <Adafruit_ADS1X15.h>
 
-// #define MESSAGES
+#define MESSAGES
 
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 // Adafruit_ADS1015 ads;     /* Use this for the 12-bit version */
 
-float noLoadOffset = 0.151; // Prior to calibration the output voltage for zero load is 151mV.
-float weightVoltageRatio = 0.00412; // According to approximations the voltage drops 4.12mV for every kilogram added to the smart bin
+float noLoadOffset = 151; // Prior to calibration the output voltage for zero load is 151mV.
+float weightVoltageRatio = 4.12; // According to approximations the voltage drops 4.12mV for every kilogram added to the smart bin
 
 void setup(void)
 {
@@ -49,7 +49,7 @@ void loop(void)
 
 #ifdef MESSAGES
   // Serial.print("Differential: "); Serial.print(results); Serial.print("("); Serial.print(results * multiplier); Serial.println("mV)");
-  Serial.print(voltage); Serial.print("V\t");
+  Serial.print(voltage); Serial.print("mV\t");
   Serial.print(weight); Serial.print("kg\n");
   delay(1000);
 #else
