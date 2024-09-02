@@ -74,6 +74,7 @@ void loop(void)
     weight = (voltage - noLoadOffset) / weightVoltageRatio;
     next = weight*(1-ALPHA) + prev*ALPHA;
     prev = next;
+    filter[i] = next;
     // Serial.println(filter[i]);
     delay(SAMPLING);
   }
