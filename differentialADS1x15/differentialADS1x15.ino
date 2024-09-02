@@ -68,12 +68,13 @@ void loop(void)
   Serial.println(voltage);
   delay(SAMPLING);
 #else
-  for(int i<0; i<WINDOW; i++) {
+  for(int i=0; i<WINDOW; i++) {
     results = ads.readADC_Differential_0_1();
     voltage = results * multiplier;
     weight = (voltage - noLoadOffset) / weightVoltageRatio;
     next = weight*(1-ALPHA) + prev*ALPHA;
     prev = next;
+    filter[i] = next;
     // Serial.println(filter[i]);
     delay(SAMPLING);
   }
