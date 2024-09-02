@@ -24,7 +24,7 @@ def readValue():
 	# measurement value
 	value = 0
 	#Open a serial port that is connected to an Arduino
-	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200)
+	ser = serial.Serial(port='/dev/ttyACM1', baudrate=115200)
 	ser.flushInput()
 
 	for i in range(samples):
@@ -60,6 +60,6 @@ while True:
 		print(valueClosed)
 		diff = valueClosed-valueOpen
 		print("Difference = " + str(diff))
-		send_weight(diff)
+		# send_weight(diff)
 
 	time.sleep(1)
