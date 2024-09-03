@@ -2,31 +2,28 @@
 
 //#define TEST
 //#define FUNC_PRINT
+//#define FUNC2_PRINT
 #define ALPHA 0.80
 
-#define WINDOW 25 // How many samples will be stored in the median filter array
-#define SAMPLING 50 // Sampling period in milliseconds
+#define WINDOW 50 // How many samples will be stored in the median filter array
+#define SAMPLING 20 // Sampling period in milliseconds
 
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 // Adafruit_ADS1015 ads;     /* Use this for the 12-bit version */
 
-float noLoadOffset = 92; // Prior to calibration the output voltage for zero load is 151mV.
+float noLoadOffset = 95; // Prior to calibration the output voltage for zero load is 151mV.
 float weightVoltageRatio = 4.12; // According to approximations the voltage drops 4.12mV for every kilogram added to the smart bin
 float next, prev;
 float filter[WINDOW];
 int16_t results;
-float voltage, weight;
+float voltage, weight, median;
 /* Be sure to update this value based on the IC and the gain settings! */
 float multiplier = 0.1875F; /* ADS1115  @ +/- 6.144V gain (16-bit results) */
 
 void setup(void)
 {
   Serial.begin(115200);
-#ifdef TEST
-  Serial.println("Hello!");
-  Serial.println("Getting differential reading from AIN0 (P) and AIN1 (N)");
-#endif
-
+  Serial.println("RawData CompFilter Median");
   // The ADC input range (or gain) can be changed via the following
   // functions, but be careful never to exceed VDD +0.3V max, or to
   // exceed the upper and lower limits if you adjust the input range!
@@ -53,34 +50,36 @@ void setup(void)
   voltage = results * multiplier;
   weight = (voltage - noLoadOffset) / weightVoltageRatio;
   prev = weight;
+  median = weight;
 }
 
 void loop(void)
 {
-  float median;
-
 #ifdef TEST
   results = ads.readADC_Differential_0_1();
   voltage = results * multiplier;
-  // Serial.print("Differential: "); Serial.print(results); Serial.print("("); Serial.print(results * multiplier); Serial.println("mV)");
-  // Serial.print(voltage); Serial.print("mV\t");
-  // Serial.print(weight); Serial.print("kg\n");
   Serial.println(voltage);
   delay(SAMPLING);
 #else
-  for(int i=0; i<WINDOW; i++) {
+//  for(int i=0; i<WINDOW; i++) {
     results = ads.readADC_Differential_0_1();
     voltage = results * multiplier;
     weight = (voltage - noLoadOffset) / weightVoltageRatio;
     next = weight*(1-ALPHA) + prev*ALPHA;
     prev = next;
-    filter[i] = next;
-    // Serial.println(filter[i]);
+//    filter[i] = next;
+    fifo(next);
+    median = median_filter(filter);
+//    Serial.println(voltage);
+//    Serial.print(weight);
+//    Serial.print(" ");
+//    Serial.print(next);
+//    Serial.print(" ");
+    Serial.println(median);
     delay(SAMPLING);
-  }
-  
-  median = median_filter(filter);
-  Serial.println(median);
+//  }
+//  median = median_filter(filter);
+//  Serial.println(median);
 #endif
 }
 
@@ -91,30 +90,38 @@ void fifo(float value)
   }
   filter[WINDOW-1] = value;
 
+#ifdef FUNC2_PRINT
   for(int i=0; i<WINDOW; i++) {
     Serial.print(filter[i]);
     Serial.print(" ");
   }
   Serial.print("\n");
+#endif
 }
 
 float median_filter(float * array)
 {
   float temp;
+  float sorted_array[WINDOW];
+
+  for(int i=0; i<WINDOW; i++) {
+    sorted_array[i] = array[i];
+  }
 
 #ifdef FUNC_PRINT
   for(int i=0; i<WINDOW; i++) {
-    Serial.print(array[i]);
+    Serial.print(sorted_array[i]);
     Serial.print(" ");
   }
 #endif
 
+  // Bubble Sort
   for(int i=0; i<WINDOW; i++) {
     for(int j=i+1; j<WINDOW; j++) {
-      if(array[i]>array[j]) {
-        temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
+      if(sorted_array[i]>sorted_array[j]) {
+        temp = sorted_array[i];
+        sorted_array[i] = sorted_array[j];
+        sorted_array[j] = temp;
       }
     }
   }
@@ -122,11 +129,11 @@ float median_filter(float * array)
 #ifdef FUNC_PRINT
   Serial.print("\n");
   for(int i=0; i<WINDOW; i++) {
-    Serial.print(array[i]);
+    Serial.print(sorted_array[i]);
     Serial.print(" ");
   }
   Serial.print("\n");
 #endif
 
-  return array[(int)WINDOW/2];
+  return sorted_array[(int)WINDOW/2];
 }
